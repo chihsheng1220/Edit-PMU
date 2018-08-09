@@ -1,4 +1,4 @@
-#Date: 2018/08/01
+#Date: 2018/08/08
 #Editor: Jim Chen
 #Version: 1.0.1
 
@@ -7,7 +7,9 @@ import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 import RPi.GPIO as GPIO #GPIO pin library
 import os
+import sys
 import time
+import psutil
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from synchrophasor.frame import ConfigFrame2
 from synchrophasor.pmu import Pmu
@@ -77,7 +79,7 @@ if __name__ == "__main__":
 
     while True:
            if pmu.clients:
-               client.connect()
+               
                time.sleep(0.02)
                AI_1 = mcp.read_adc(0)
                AI_2 = mcp.read_adc(1)
@@ -99,29 +101,54 @@ if __name__ == "__main__":
                DI_2 = GPIO.input(13) #Read Input Pin 13 as a Digital In
                DI_3 = GPIO.input(29) #Read Input Pin 29 as a Digital In
                DI_4 = GPIO.input(31) #Read Input Pin 31 as a Digital In
+               
+               #raspberry pi system info
                hour = time.localtime().tm_hour
                minute = time.localtime().tm_min
                seconds = time.localtime().tm_sec
                system_time = hour * 10000 + minute *100 + seconds               
                file = open("/sys/class/thermal/thermal_zone0/temp")
-               system_temp = float(file.read()) /1000
+               system_temp = round(float(file.read()) / 100)
                file.close()
+               
+               
+               cpu_usage = round(psutil.cpu_percent(interval=1, percpu=False) * 10)
+               virtual_memory_usage = round(psutil.virtual_memory().percent * 10)
+               swap_memory_usage = round(psutil.swap_memory().percent * 10)
+               disk_usage = round(psutil.disk_usage('/').percent * 10)
+               
+               file = open("/home/pi/dht22_temperature")
+               try:
+                   dht22_temp = round(float(file.read()) * 10)
+               except ValueError:
+                   dht22_temp = 0 
+               file.close()
+               file = open("/home/pi/dht22_humidity")
+               try:
+                   dht22_humi = round(float(file.read()) * 10)
+               except ValueError:
+                   dht22_humi = 0
+               file.close()
+               
                pmu.send_data(phasors=[(AI_1, 0),
                             (AI_2, 0),
                             (AI_3, 0), (AI_4, 0)],
                           analog=[AI_1, AI_2, AI_3, system_time, system_temp],
                           digital=[DI_1, DI_2, DI_3, DI_4])
-                          
+               
+               client.connect()           
                rr = client.read_input_registers(0, 8, unit=1)
-               rq = client.write_registers(0, [AI_1, 1, AI_3, AI_4, AI_5, AI_6, AI_7, AI_8], unit=1)
+               rq = client.write_registers(0, [AI_1, AI_2, AI_3, AI_4, AI_5, AI_6, AI_7, AI_8], unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rr = client.read_holding_registers(0, 8, unit=1)
+               rq = client.write_registers(10, [system_temp, cpu_usage, disk_usage, virtual_memory_usage, swap_memory_usage, dht22_temp, dht22_humi, 1], unit=1)
                assert(rq.function_code < 0x80)#if FC>0x80 --> Error
                rr = client.read_holding_registers(0, 8, unit=1)
                
                rr = client.read_discrete_inputs(0, 4, unit=1)
-               rq = client.write_coils(0, [1, DI_2, DI_3, DI_4], unit=1)
+               rq = client.write_coils(0, [DI_1, DI_2, DI_3, DI_4], unit=1)
                rr = client.read_coils(0, 4, unit=1)
+               client.close()
                
-               
-               
-    client.close()      
+     
     pmu.join()
