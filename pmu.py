@@ -1,6 +1,6 @@
-#Date: 2018/08/08
+#Date: 2018/08/10
 #Editor: Jim Chen
-#Version: 1.0.1
+#Version: 1.0.2
 
 import random
 import Adafruit_GPIO.SPI as SPI
@@ -138,12 +138,42 @@ if __name__ == "__main__":
                
                client.connect()           
                rr = client.read_input_registers(0, 8, unit=1)
-               rq = client.write_registers(0, [AI_1, AI_2, AI_3, AI_4, AI_5, AI_6, AI_7, AI_8], unit=1)
+               #rq = client.write_registers(0, [AI_1, AI_2, AI_3, AI_4, AI_5, AI_6, AI_7, AI_8], unit=1)
+               rq = client.write_registers(0, AI_1, unit=1)               
                assert(rq.function_code < 0x80)#if FC>0x80 --> Error
-               rr = client.read_holding_registers(0, 8, unit=1)
-               rq = client.write_registers(10, [system_temp, cpu_usage, disk_usage, virtual_memory_usage, swap_memory_usage, dht22_temp, dht22_humi, 1], unit=1)
+               rq = client.write_registers(1, AI_2, unit=1)               
                assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(2, AI_3, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(3, AI_4, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(4, AI_5, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(5, AI_6, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(6, AI_7, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(7, AI_8, unit=1)               
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               
                rr = client.read_holding_registers(0, 8, unit=1)
+               #rq = client.write_registers(10, [system_temp, cpu_usage, disk_usage, virtual_memory_usage, swap_memory_usage, dht22_temp, dht22_humi, 1], unit=1)
+               rq = client.write_registers(10, system_temp, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(11, cpu_usage, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(12, disk_usage, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(13, virtual_memory_usage, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(14, swap_memory_usage, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(15, dht22_temp, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               rq = client.write_registers(16, dht22_humi, unit=1)
+               assert(rq.function_code < 0x80)#if FC>0x80 --> Error
+               
+               rr = client.read_holding_registers(0, 7, unit=1)
                
                rr = client.read_discrete_inputs(0, 4, unit=1)
                rq = client.write_coils(0, [DI_1, DI_2, DI_3, DI_4], unit=1)

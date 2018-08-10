@@ -1,13 +1,5 @@
 #!/usr/bin/env python
-"""
-Pymodbus Synchronous Server Example
---------------------------------------------------------------------------
 
-The synchronous server is implemented in pure python without any third
-party libraries (unless you need to use the serial protocols which require
-pyserial). This is helpful in constrained or old environments where using
-twisted just is not feasable. What follows is an examle of its use:
-"""
 # --------------------------------------------------------------------------- # 
 # import the various server implementations
 # --------------------------------------------------------------------------- # 
