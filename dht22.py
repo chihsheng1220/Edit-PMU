@@ -1,3 +1,5 @@
+import os
+import sys
 import time
 import Adafruit_DHT
 
@@ -10,8 +12,11 @@ if __name__ == "__main__":
    while True:
        time.sleep(2)
        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
-       
-        
+       if temperature == None:
+        temperature = 0
+       if humidity == None:
+        humidity = 0
+                      
        f = open('/home/pi/dht22_temperature', 'w+')
        f.write(str(temperature))
        f.close()

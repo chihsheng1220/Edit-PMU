@@ -119,13 +119,13 @@ if __name__ == "__main__":
                
                file = open("/home/pi/dht22_temperature")
                try:
-                   dht22_temp = round(float(file.read()) * 10)
+                   dht22_temp = int(float(file.read())*10)
                except ValueError:
                    dht22_temp = 0 
                file.close()
                file = open("/home/pi/dht22_humidity")
                try:
-                   dht22_humi = round(float(file.read()) * 10)
+                   dht22_humi = int(float(file.read())*10)
                except ValueError:
                    dht22_humi = 0
                file.close()
