@@ -1,13 +1,5 @@
 #!/usr/bin/env python
-"""
-Pymodbus Synchronous Server Example
---------------------------------------------------------------------------
 
-The synchronous server is implemented in pure python without any third
-party libraries (unless you need to use the serial protocols which require
-pyserial). This is helpful in constrained or old environments where using
-twisted just is not feasable. What follows is an examle of its use:
-"""
 # --------------------------------------------------------------------------- # 
 # import the various server implementations
 # --------------------------------------------------------------------------- # 
@@ -20,6 +12,7 @@ from pymodbus.datastore import ModbusSequentialDataBlock, ModbusSparseDataBlock
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext
 
 from pymodbus.transaction import ModbusRtuFramer, ModbusBinaryFramer
+import getIP
 import time
 time.sleep(3)
 
@@ -33,6 +26,7 @@ time.sleep(3)
 #log = logging.getLogger()
 #log.setLevel(logging.DEBUG)
 
+getIP = getIP.myIP()
 
 def run_server():
     # ----------------------------------------------------------------------- # 
@@ -90,10 +84,10 @@ def run_server():
     #     store = ModbusSlaveContext(..., zero_mode=True)
     # ----------------------------------------------------------------------- # 
     store = ModbusSlaveContext(
-        di=ModbusSequentialDataBlock(0, [0]*10000),
-        co=ModbusSequentialDataBlock(0, [0]*10000),
-        hr=ModbusSequentialDataBlock(0, [0]*10000),
-        ir=ModbusSequentialDataBlock(0, [0]*10000))
+        di=ModbusSequentialDataBlock(0, [0]*99999),
+        co=ModbusSequentialDataBlock(0, [0]*99999),
+        hr=ModbusSequentialDataBlock(0, [0]*99999),
+        ir=ModbusSequentialDataBlock(0, [0]*99999))
 
     context = ModbusServerContext(slaves=store, single=True)
     
@@ -114,7 +108,7 @@ def run_server():
     # run the server you want
     # ----------------------------------------------------------------------- # 
     # Tcp:
-    StartTcpServer(context, identity=identity, address=("192.168.4.194", 502))
+    StartTcpServer(context, identity=identity, address=(getIP, 502))
 
     # TCP with different framer
     #StartTcpServer(context, identity=identity,
